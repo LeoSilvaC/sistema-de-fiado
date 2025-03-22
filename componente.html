@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="PT-br">
+  <body>
+    <header>
+      <nav class="cabecalho">
+        <ul class="lista-cab">
+          <li class="item-cab">
+            <img src="img/Menu Aberto.svg" alt="Menu" class="menu-hamb" />
+          </li>
+          <li class="\index.htmlitem-cab">
+            <h1 class="titulo-principal">FIADOS</h1>
+          </li>
+          <li class="item-cab-caixa">
+            <p class="titulo-caixa">CAIXA TOTAL</p>
+            <p class="caixa-valor">R$ 0,00</p>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="main">
+      <section class="container-registro">
+        <input class="form-input" type="text" placeholder="Insira um nome" />
+        <img src="/img/adicionar.png" alt="" class="adc-logo" />
+      </section>
+
+      <hr />
+      <section class="container-pessoas">
+        <div class="container">
+          <div class="pessoa">
+            <p class="nome-pessoa">Elcimara Ribeiro</p>
+            <button class="btn-editar">Editar</button>
+
+            <label class="nome">Açaí</label>
+            <div class="controle" data-produto="acai">
+              <button class="controle-botao">-</button>
+              <input
+                type="text"
+                class="controle-contador"
+                value="0"
+                data-contador
+              />
+              <button class="controle-botao">+</button>
+            </div>
+
+            <label class="nome">Empada</label>
+            <div class="controle" data-produto="empada">
+              <button class="controle-botao">-</button>
+              <input
+                type="text"
+                class="controle-contador"
+                value="0"
+                data-contador
+              />
+              <button class="controle-botao">+</button>
+            </div>
+
+            <p class="texto-total">Total</p>
+            <p class="valor-total" data-estatistica>R$ 0,00</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
