@@ -1,73 +1,543 @@
 <!DOCTYPE html>
-<html lang="PT-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <link rel="stylesheet" href="css/reset.css" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <title>Sistema de Fiados</title>
-  </head>
-  <body>
-    <header class="header">
-      <nav class="cabecalho">
-        <div class="cabecalho-esquerda">
-          <button class="menu-hamb">
-            <img src="img/Menu Aberto.svg" alt="Menu" />
-          </button>
-          <h1 class="titulo-principal">Sistema de Fiados</h1>
-        </div>
-        <div class="cabecalho-direita">
-          <div class="caixa-info">
-            <p class="titulo-caixa">CAIXA TOTAL</p>
-            <p class="caixa-valor">R$ 0,00</p>
-          </div>
-        </div>
-      </nav>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caderneta de Fiado Digital</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f3f4f6;
+            --card: #ffffff;
+            --text: #1f2937;
+            --gray-light: #e5e7eb;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        body { margin: 0; padding: 20px; background-color: var(--bg); color: var(--text); }
+
+        /* Container Principal */
+        .container { max-width: 800px; margin: 0 auto; }
+
+        /* Cabeçalho e Busca */
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: var(--primary); margin-bottom: 10px; }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"], input[type="number"], input[type="date"] {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        button:active { transform: scale(0.98); }
+
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-outline { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); }
+
+        /* Lista de Clientes (Cards) */
+        .client-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .client-card {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden; 
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background-color: #fff;
+        }
+
+        .client-name { font-size: 1.2em; font-weight: bold; }
+        .client-total { font-size: 1.4em; color: var(--danger); font-weight: bold; }
+        .total-label { font-size: 0.9em; color: #666; }
+
+        /* Estilos da Lista de Produtos dentro do Card */
+        .products-container {
+            padding: 10px 20px;
+            background-color: #fcfcfc;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .product-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .product-row:last-child { border-bottom: none; }
+
+        .prod-details { display: flex; flex-direction: column; }
+        .prod-name { font-weight: 600; font-size: 0.95em; color: #333; }
+        .prod-price { font-size: 0.8em; color: #666; }
+
+        .qty-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .btn-mini {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            padding: 0;
+            border-radius: 4px;
+        }
+        .btn-plus { background-color: var(--primary); color: white; }
+        .btn-minus { background-color: #fff; color: var(--danger); border: 1px solid var(--danger); }
+        .qty-text { font-weight: bold; min-width: 20px; text-align: center; }
+
+        .card-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { font-size: 24px; cursor: pointer; color: #666; }
+
+        /* Histórico */
+        .history-list { list-style: none; padding: 0; margin-top: 10px; }
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        .history-date { color: #888; font-size: 0.8em; display: block; }
+        .positive { color: var(--success); } 
+        .negative { color: var(--danger); } 
+
+        @media (max-width: 600px) {
+            .controls { flex-direction: column; }
+            .btn-primary { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>📒 Fiados </h1>
     </header>
 
-    <main class="main">
-      <div class="container-principal">
-        <div class="container-barras">
-          <section class="container-registro">
-            <div class="form-grupo">
-              <input
-                class="form-input"
-                type="text"
-                placeholder="Nome do cliente"
-              />
-              <button type="button" class="botao-adicionar">
-                <img src="img/adicionar.png" alt="Adicionar" class="adc-logo" />
-              </button>
-            </div>
-          </section>
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="🔍 Buscar cliente..." oninput="renderClients()">
+        <button class="btn-primary" onclick="openModal('modalAddClient')">+ Novo Cliente</button>
+    </div>
 
-          <section class="container-pesquisa">
-            <div class="form-grupo">
-              <input
-                class="form-input"
-                type="text"
-                placeholder="Pesquisar cliente"
-                id="pesquisa-input"
-              />
-              <button type="button" class="botao-pesquisar">🔍</button>
+    <div id="clientList" class="client-list">
+        </div>
+</div>
+
+<div id="modalAddClient" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Adicionar Cliente</h2>
+            <span class="close-btn" onclick="closeModal('modalAddClient')">&times;</span>
+        </div>
+        <input type="text" id="newClientName" placeholder="Nome da pessoa" style="width: 100%; margin-bottom: 15px;">
+        <button class="btn-primary" style="width: 100%" onclick="addClient()">Salvar</button>
+    </div>
+</div>
+
+<div id="modalTransaction" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="transTitle">Nova Compra</h2>
+            <span class="close-btn" onclick="closeModal('modalTransaction')">&times;</span>
+        </div>
+        <input type="hidden" id="transClientId">
+        <input type="hidden" id="transType"> 
+        
+        <label>Descrição (O que comprou?)</label>
+        <input type="text" id="transDesc" placeholder="Ex: Leite, Pão..." style="width: 100%; margin-bottom: 10px;">
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div>
+                <label>Valor (R$)</label>
+                <input type="number" id="transValue" placeholder="0,00" step="0.01">
             </div>
-          </section>
+            <div>
+                <label>Qtd.</label>
+                <input type="number" id="transQty" value="1" style="width: 80px;">
+            </div>
         </div>
 
-        <section class="container-pessoas">
-          <!-- Os cards de pessoas serão inseridos aqui dinamicamente -->
-        </section>
-      </div>
-    </main>
-    <script src="scripts/price-calc.js" type="module"></script>
-    <script src="scripts/register.js" type="module"></script>
-  </body>
+        <button class="btn-primary" style="width: 100%" onclick="saveTransaction()">Confirmar</button>
+    </div>
+</div>
+
+<div id="modalHistory" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="historyTitle">Histórico</h2>
+            <span class="close-btn" onclick="closeModal('modalHistory')">&times;</span>
+        </div>
+        <ul id="historyList" class="history-list">
+        </ul>
+        <div style="margin-top: 20px; text-align: center;">
+             <button class="btn-danger full-width" onclick="deleteCurrentClient()">Excluir Cliente</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- ESTADO DA APLICAÇÃO ---
+    let clients = JSON.parse(localStorage.getItem('fiadoSystemDB')) || [];
+    let currentClientId = null;
+
+    // --- FUNÇÕES PRINCIPAIS ---
+
+    function saveToLocal() {
+        localStorage.setItem('fiadoSystemDB', JSON.stringify(clients));
+        renderClients();
+    }
+
+    function addClient() {
+        const nameInput = document.getElementById('newClientName');
+        const name = nameInput.value.trim();
+        
+        if (!name) return alert("Por favor, digite o nome.");
+
+        const newClient = {
+            id: Date.now(), // ID baseado no tempo (quanto maior, mais novo)
+            name: name,
+            transactions: [], 
+            activeItems: [] 
+        };
+
+        clients.push(newClient);
+        nameInput.value = '';
+        closeModal('modalAddClient');
+        saveToLocal();
+    }
+
+    function deleteCurrentClient() {
+        if(confirm("Tem certeza que deseja excluir este cliente e todo o histórico?")) {
+            clients = clients.filter(c => c.id !== currentClientId);
+            closeModal('modalHistory');
+            saveToLocal();
+        }
+    }
+
+    // Calcula saldo
+    function getBalance(client) {
+        let itemsTotal = 0;
+        if(client.activeItems) {
+            itemsTotal = client.activeItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
+        }
+
+        let payments = client.transactions
+            .filter(t => t.type === 'pay')
+            .reduce((acc, t) => acc + t.value, 0);
+
+        return itemsTotal - payments;
+    }
+
+    // Renderiza (desenha) os cards
+    function renderClients() {
+        const list = document.getElementById('clientList');
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        list.innerHTML = '';
+
+        // Filtra pelo nome E DEPOIS ORDENA (Mais novo primeiro)
+        const filtered = clients
+            .filter(c => c.name.toLowerCase().includes(search))
+            .sort((a, b) => b.id - a.id); // Ordenação Decrescente: ID maior (mais novo) vem primeiro
+
+        filtered.forEach(client => {
+            const total = getBalance(client);
+            
+            // HTML da lista de produtos com botões +/-
+            let itemsHtml = '';
+            if (client.activeItems && client.activeItems.length > 0) {
+                itemsHtml = `<div class="products-container">`;
+                client.activeItems.forEach((item, idx) => {
+                    itemsHtml += `
+                        <div class="product-row">
+                            <div class="prod-details">
+                                <span class="prod-name">${item.name}</span>
+                                <span class="prod-price">R$ ${item.price.toFixed(2)}</span>
+                            </div>
+                            <div class="qty-wrapper">
+                                <button class="btn-mini btn-minus" onclick="quickUpdateQty(${client.id}, ${idx}, -1)">-</button>
+                                <span class="qty-text">${item.qty}</span>
+                                <button class="btn-mini btn-plus" onclick="quickUpdateQty(${client.id}, ${idx}, 1)">+</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                itemsHtml += `</div>`;
+            } else {
+                itemsHtml = `<div class="products-container" style="color:#999; font-size:0.9em; font-style:italic;">Nenhum produto em aberto.</div>`;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'client-card';
+            div.innerHTML = `
+                <div class="card-header">
+                    <span class="client-name">${client.name}</span>
+                    <div style="text-align: right;">
+                        <span class="total-label">Deve:</span><br>
+                        <span class="client-total">${formatMoney(total)}</span>
+                    </div>
+                </div>
+                
+                ${itemsHtml}
+
+                <div class="card-actions">
+                    <button class="btn-success" onclick="openTransaction('${client.id}', 'buy')">+ Compra</button>
+                    <button class="btn-primary" onclick="openTransaction('${client.id}', 'pay')">Pagar</button>
+                    <button class="btn-outline full-width" onclick="showHistory('${client.id}')">Ver Histórico</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    // --- Botões Rápidos +/- ---
+    function quickUpdateQty(clientId, itemIndex, change) {
+        const client = clients.find(c => c.id === clientId);
+        if (!client || !client.activeItems) return;
+
+        const item = client.activeItems[itemIndex];
+        
+        if (change === 1) {
+            item.qty++;
+            // Log invisivel
+            client.transactions.push({
+                date: new Date().toISOString(),
+                type: 'buy',
+                desc: `+1 ${item.name} (Rápido)`,
+                value: item.price,
+                qty: 1,
+                isHidden: true 
+            });
+        } else {
+            item.qty--;
+            client.transactions.push({
+                date: new Date().toISOString(),
+                type: 'info',
+                desc: `-1 ${item.name} (Rápido)`,
+                value: 0,
+                qty: 0
+            });
+
+            if (item.qty <= 0) {
+                if(confirm(`Remover ${item.name} da lista?`)) {
+                    client.activeItems.splice(itemIndex, 1);
+                } else {
+                    item.qty = 1; 
+                }
+            }
+        }
+        saveToLocal();
+    }
+
+    // --- TRANSAÇÕES ---
+
+    function openTransaction(id, type) {
+        currentClientId = parseInt(id);
+        document.getElementById('transType').value = type;
+        document.getElementById('transClientId').value = id;
+        
+        const title = type === 'buy' ? 'Adicionar Novo Item' : 'Abater Valor (Pagar)';
+        document.getElementById('transTitle').innerText = title;
+        
+        const descInput = document.getElementById('transDesc');
+        const qtyInput = document.getElementById('transQty');
+        const valInput = document.getElementById('transValue');
+        
+        if (type === 'pay') {
+            descInput.value = "Pagamento em Dinheiro";
+            qtyInput.parentElement.style.display = 'none'; 
+        } else {
+            descInput.value = "";
+            descInput.placeholder = "Ex: Cerveja, Salgado...";
+            qtyInput.parentElement.style.display = 'block'; 
+            qtyInput.value = 1;
+        }
+
+        valInput.value = '';
+        openModal('modalTransaction');
+    }
+
+    function saveTransaction() {
+        const id = parseInt(document.getElementById('transClientId').value);
+        const type = document.getElementById('transType').value;
+        const desc = document.getElementById('transDesc').value || (type === 'pay' ? 'Pagamento' : 'Item sem nome');
+        const val = parseFloat(document.getElementById('transValue').value);
+        const qty = type === 'buy' ? parseInt(document.getElementById('transQty').value) : 1;
+
+        if (isNaN(val) || val <= 0) return alert("Digite um valor válido.");
+
+        const client = clients.find(c => c.id === id);
+        if (client) {
+            if (type === 'buy') {
+                if (!client.activeItems) client.activeItems = [];
+                const existing = client.activeItems.find(i => i.name.toLowerCase() === desc.toLowerCase() && i.price === val);
+                if (existing) {
+                    existing.qty += qty;
+                } else {
+                    client.activeItems.push({ name: desc, price: val, qty: qty });
+                }
+            }
+
+            client.transactions.push({
+                date: new Date().toISOString(),
+                type: type,
+                desc: desc,
+                value: val,
+                qty: qty
+            });
+
+            saveToLocal();
+            closeModal('modalTransaction');
+        }
+    }
+
+    // --- HISTÓRICO ---
+
+    function showHistory(id) {
+        currentClientId = parseInt(id);
+        const client = clients.find(c => c.id === currentClientId);
+        if (!client) return;
+
+        document.getElementById('historyTitle').innerText = `Histórico: ${client.name}`;
+        const list = document.getElementById('historyList');
+        list.innerHTML = '';
+
+        const sortedTrans = [...client.transactions].reverse();
+
+        if (sortedTrans.length === 0) {
+            list.innerHTML = '<li style="text-align:center; padding:20px; color:#888;">Nenhum histórico ainda.</li>';
+        }
+
+        sortedTrans.forEach(t => {
+            const dateObj = new Date(t.date);
+            const dateStr = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            
+            const isBuy = t.type === 'buy';
+            const colorClass = isBuy ? 'negative' : 'positive';
+            const sign = isBuy ? '+' : '-';
+            const isInfo = t.type === 'info';
+            const displayValue = isInfo ? '' : `${sign} ${formatMoney(t.value * (t.qty || 1))}`;
+
+            const li = document.createElement('li');
+            li.className = 'history-item';
+            li.innerHTML = `
+                <div>
+                    <span class="history-date">${dateStr}</span>
+                    <strong>${t.desc}</strong> ${isBuy && t.qty > 1 ? `(x${t.qty})` : ''}
+                </div>
+                <div class="${colorClass}" style="font-weight:bold;">
+                    ${displayValue}
+                </div>
+            `;
+            list.appendChild(li);
+        });
+
+        openModal('modalHistory');
+    }
+
+    // --- UTILITÁRIOS ---
+
+    function formatMoney(value) {
+        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    window.onclick = function(event) { if (event.target.classList.contains('modal')) event.target.style.display = "none"; }
+
+    // Migração para garantir que todos tenham a lista
+    clients.forEach(c => { if(!c.activeItems) c.activeItems = []; });
+
+    renderClients();
+
+</script>
+</body>
 </html>
