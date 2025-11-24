@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb"> <link rel="manifest" href="manifest.json">
     <title>Caderneta de Fiado Digital</title>
     <style>
         :root {
@@ -30,6 +30,30 @@
         /* Cabeçalho e Busca */
         header { text-align: center; margin-bottom: 30px; }
         h1 { color: var(--primary); margin-bottom: 10px; }
+        
+        /* NOVO: Estilo para o Total Geral */
+        .total-summary-card {
+            background-color: var(--card);
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-summary-card .label {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .total-summary-card .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #16a34a; /* Cor de destaque para o total de fiado */
+        }
         
         .controls {
             display: flex;
@@ -208,6 +232,10 @@
         <h1>📒 Fiados </h1>
     </header>
 
+    <div id="totalSummaryCard" class="total-summary-card">
+        <span class="label">Total: </span>
+        <span id="totalBalanceValue" class="value">R$ 0,00</span>
+    </div>
     <div class="controls">
         <input type="text" id="searchInput" placeholder="🔍 Buscar cliente..." oninput="renderClients()">
         <button class="btn-primary" onclick="openModal('modalAddClient')">+ Novo Cliente</button>
@@ -308,7 +336,7 @@
         }
     }
 
-    // Calcula saldo
+    // Calcula saldo individual
     function getBalance(client) {
         let itemsTotal = 0;
         if(client.activeItems) {
@@ -322,11 +350,25 @@
         return itemsTotal - payments;
     }
 
+    // NOVO: Calcula saldo total de todos os clientes
+    function getAllTotalBalance() {
+        let total = 0;
+        clients.forEach(client => {
+            total += getBalance(client);
+        });
+        return total;
+    }
+
     // Renderiza (desenha) os cards
     function renderClients() {
         const list = document.getElementById('clientList');
         const search = document.getElementById('searchInput').value.toLowerCase();
         list.innerHTML = '';
+
+        // NOVO: Atualiza o Total Geral antes de renderizar a lista
+        const totalGeral = getAllTotalBalance();
+        document.getElementById('totalBalanceValue').innerText = formatMoney(totalGeral);
+
 
         // Filtra pelo nome E DEPOIS ORDENA (Mais novo primeiro)
         const filtered = clients
@@ -546,6 +588,3 @@
 </script>
 </body>
 </html>
-
-
-
